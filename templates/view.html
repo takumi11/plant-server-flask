@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<center>
+    <p style="text-align:center;margin:10px;font-size: 24px;">{{ result.created }}</p>
+    <div style="text-align:center;">
+        <a href="/images/origin/{{ result.savename }}">
+            <img src="/images/origin/{{ result.savename }}" width="200" height="200">
+        </a>
+        <a href="/images/masked/{{ result.savename }}">
+            <img src="/images/masked/{{ result.savename }}" width="200" height="200">
+        </a>
+        <a href="/images/gradcam/{{ result.savename }}">
+            <img src="/images/gradcam/{{ result.savename }}" width="200" height="200">
+        </a>
+        <h3 style="text-align:center;"> disease : {{ result.disease }}  </h3>
+    </div>
+    <div>
+        <a href="/archive">
+            <button class="btn btn-primary" style="margin:10px;">戻る</button>
+        </a>
+    </div>
+</center>
+{% endblock %}

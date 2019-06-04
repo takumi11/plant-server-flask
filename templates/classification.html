@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+     <center>
+      <div class="card" style="width: 100rem;margin:10px;">
+          <center>
+          <h4>ファイルを選択して送信してください</h4>
+              <form action = "/classification" method = "POST" enctype = "multipart/form-data">
+                  <input type="file" name="file" id="elmFile" onchange="selectFile()">
+                  <input type="submit" class="btn btn-danger" value="送信する" style="margin:10px;">
+              </form>
+          </center>
+      </div>
+      <a href="/archive">
+          <button class="btn btn-primary"> アーカイブ </button>
+      </a>
+  </center>
+
+      {% if name_path %}
+      <ceter>
+          <div class="result" style="margin:10px;">
+              <p style="text-align:center;">
+                  <img src="/images/origin/{{ name_path }}" width="300" height="300">
+                  <img src="/images/masked/{{ name_path }}" width="300" height="300">
+                  <img src="/images/gradcam/{{ name_path }}" width="300" height="300">
+                  <h3 style="text-align:center;">disease : {{ top1 }}    [{{ result }} %] </h3>
+              </p>
+          </div>
+      </center>
+      {% endif %}
+
+{% endblock %}
