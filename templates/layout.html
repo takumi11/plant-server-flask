@@ -4,20 +4,8 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Plant Disease Classifier</title>
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/bootstrap.min.css') }}">
-        <script type="text/javascript">
-            window.onload = function() {
-                document.getElementById("btnUpload").disabled = true;
-            }
-            function selectFile() {
-                if (document.getElementById("elmFile").value === "") {
-                    document.getElementById("btnUpload").disabled = true;
-                }
-                else {
-                    document.getElementById("btnUpload").disabled = false;
-                }
-            }
-        </script>
+        <link rel= "stylesheet" type= "text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+        <script type=text/javascript src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
     </head>
 
    <body class="bg-warning">

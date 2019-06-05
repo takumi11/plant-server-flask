@@ -6,7 +6,20 @@
           <h4>ファイルを選択して送信してください</h4>
               <form action = "/classification" method = "POST" enctype = "multipart/form-data">
                   <input type="file" name="file" id="elmFile" onchange="selectFile()">
-                  <input type="submit" class="btn btn-danger" value="送信する" style="margin:10px;">
+                  <input type="submit" class="btn btn-danger" id="btnUpload" value="送信する" style="margin:10px;">
+                  <script type="text/javascript">
+                        window.onload = function() {
+                            document.getElementById("btnUpload").disabled = true;
+                        }
+                        function selectFile() {
+                            if (document.getElementById("elmFile").value === "") {
+                                document.getElementById("btnUpload").disabled = true;
+                            }
+                            else {
+                            document.getElementById("btnUpload").disabled = false;
+                            }
+                        }
+                </script>
               </form>
           </center>
       </div>
@@ -16,13 +29,13 @@
   </center>
 
       {% if name_path %}
-      <ceter>
+      <center>
           <div class="result" style="margin:10px;">
               <p style="text-align:center;">
                   <img src="/images/origin/{{ name_path }}" width="300" height="300">
                   <img src="/images/masked/{{ name_path }}" width="300" height="300">
                   <img src="/images/gradcam/{{ name_path }}" width="300" height="300">
-                  <h3 style="text-align:center;">disease : {{ top1 }}    [{{ result }} %] </h3>
+                  <h3 style="text-align:center;">[{{ pk }}] disease : {{ top1 }}    [{{ result }} %] </h3>
               </p>
           </div>
       </center>

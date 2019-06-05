@@ -11,7 +11,6 @@ from flask import (
     Flask,
     render_template,
     request,
-    redirect,
     send_from_directory,
     g,)
 
@@ -104,27 +103,33 @@ def upload():
 
         # encode
         img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
-        org = cv2.imdecode(img_array, 1)
+        try:
+            org = cv2.imdecode(img_array, 1)
 
-        # centercrop & resize
-        org = tool.center_crop(org)
-        org = cv2.resize(org, (256, 256))
-        cv2.imwrite(origin_path, org)
-        org = cv2.cvtColor(org, cv2.COLOR_BGR2RGB)
+            # centercrop & resize
+            org = tool.center_crop(org)
+            org = cv2.resize(org, (256, 256))
+            cv2.imwrite(origin_path, org)
+            org = cv2.cvtColor(org, cv2.COLOR_BGR2RGB)
 
-        # background remove and save image
-        out = tool.generate(org, gen)
-        cv2.imwrite(masked_path, cv2.cvtColor(out, cv2.COLOR_RGB2BGR))
-        # classification
-        top1_label, result = tool.classifier(out, classify)
-        # grad cam and save image
-        gradcam = tool.grad_cam(out, classify)
-        cv2.imwrite(gradcam_path, gradcam)
+            # background remove and save image
+            out = tool.generate(org, gen)
+            cv2.imwrite(masked_path, cv2.cvtColor(out, cv2.COLOR_RGB2BGR))
+            # classification
+            top1_label, result = tool.classifier(out, classify)
+            # grad cam and save image
+            gradcam = tool.grad_cam(out, classify)
+            cv2.imwrite(gradcam_path, gradcam)
 
-        con = get_db()
-        pk = tool.insert(con, file_name, top1_label, now+".jpg")
+            con = get_db()
+            pk = tool.insert(con, file_name, top1_label, now+".jpg")
 
-        return render_template('classification.html', name_path=now + ".jpg", top1=top1_label, result=result)
+            return render_template('classification.html',
+                                   name_path=now + ".jpg",
+                                   pk=pk, top1=top1_label, result=result)
+
+        except Exception as e:
+            return render_template('bad_request.html')
 
 
 @app.route('/view/<pk>')
@@ -148,11 +153,6 @@ def archive():
     con = get_db()
     results = tool.select_all(con)
     return render_template('archive.html', results=results)
-
-
-@app.errorhandler(400)
-def error_handler(error):
-    return render_template('bad_request.html'), 400
 
 
 if __name__ == '__main__':

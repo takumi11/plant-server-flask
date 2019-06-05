@@ -1,14 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2> Bad request </h2>
-<p style="text-align:center;">
-    <h3> Please go back and send the file </h3>
-</p>
 
-<div>
-    <a href="/classification">
-        <button class="btn btn-primary" style="margin:10px;">診断に戻る</button>
-    </a>
-</div>
+<center>
+    <div style="top: 70px; width: 800px; height: 150px;
+                padding: 10px; background: #fff; border: 2px solid #006;
+                border-radius: 10px;
+                font-size: 16px; color: #000;">
+        <div>
+            <h2> Uploaded File is not Image</h2>
+        </div>
+
+        <div>
+            <p>
+                <h3> Please go back and send the image file </h3>
+            </p>
+        </div>
+    </div>
+</center>
+
+<center>
+    <div>
+        <a href="/classification">
+            <button class="btn btn-primary" style="margin:10px;">診断に戻る</button>
+        </a>
+    </div>
+</center>
 
 {% endblock %}
