@@ -100,20 +100,26 @@ def center_crop(img):
 def insert(con, inputname, disease, savename):
     """ INSERT処理 """
     cur = con.cursor()
-    cur.execute('insert into results (inputname, disease, savename) values (?, ?, ?)', [inputname, disease, savename])
+    cur.execute('insert into results (inputname, disease, savename) values (?, ?, ?)', [
+                inputname, disease, savename])
     pk = cur.lastrowid
     con.commit()
     return pk
 
+
 def select(con, pk):
     """ 指定したキーのデータをSELECTする """
-    cur = con.execute('select id, inputname, disease, savename, created from results where id=?', (pk,))
+    cur = con.execute(
+        'select id, inputname, disease, savename, created from results where id=?', (pk,))
     return cur.fetchone()
+
 
 def select_all(con):
     """ SELECTする """
-    cur = con.execute('select id, inputname, disease, savename, created from results order by id desc')
+    cur = con.execute(
+        'select id, inputname, disease, savename, created from results order by id desc')
     return cur.fetchall()
+
 
 def delete(con, pk):
     """ 指定したキーのデータをDELETEする """

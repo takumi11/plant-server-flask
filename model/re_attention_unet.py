@@ -1,22 +1,22 @@
 import chainer
 import chainer.functions as F
 import chainer.links as L
-from training.model.base_block import ConvBNR, DconvBNR
+from model.base_block import ConvBNR, DconvBNR
 
-network_name = 'attention_unet'
+network_name = 're_attention_unet'
 Blocks = {'conv': ConvBNR, 'deconv': DconvBNR}
 
 
 class Attention_block(chainer.Chain):
-    def __init__(self, g_ch, l_ch, int_ch):
+    def __init__(self, l_ch, g_ch, int_ch, pad):
         w = chainer.initializers.HeNormal()
         super(Attention_block, self).__init__()
         with self.init_scope():
-            self.W_g = L.Convolution2D(g_ch, int_ch, 1, 1, 0, initialW=w)
-            self.bn_g = L.BatchNormalization(int_ch)
-
-            self.W_x = L.Convolution2D(g_ch, int_ch, 1, 1, 0, initialW=w)
+            self.W_x = L.Convolution2D(l_ch, int_ch, 1, 1, 0, initialW=w)
             self.bn_x = L.BatchNormalization(int_ch)
+
+            self.W_g = L.Convolution2D(g_ch, int_ch, 1, 1, pad, initialW=w)
+            self.bn_g = L.BatchNormalization(int_ch)
 
             self.psi = L.Convolution2D(int_ch, 1, 1, 1, 0, initialW=w)
             self.bn_psi = L.BatchNormalization(1)
@@ -48,25 +48,25 @@ class Generator(chainer.Chain):
             self.e7 = Block(512, 512, sample='down')
 
             self.d0 = Block(512, 512, sample='up')
-            self.a0 = Attention_block(512, 512, 256)
+            self.a0 = Attention_block(512, 512, 256, 1)
 
             self.d1 = Block(1024, 512, sample='up')
-            self.a1 = Attention_block(512, 512, 256)
+            self.a1 = Attention_block(512, 1024, 256, 2)
 
             self.d2 = Block(1024, 512, sample='up')
-            self.a2 = Attention_block(512, 512, 256)
+            self.a2 = Attention_block(512, 1024, 256, 4)
 
             self.d3 = Block(1024, 512, sample='up')
-            self.a3 = Attention_block(512, 512, 256)
+            self.a3 = Attention_block(512, 1024, 256, 8)
 
             self.d4 = Block(1024, 256, sample='up')
-            self.a4 = Attention_block(256, 256, 128)
+            self.a4 = Attention_block(256, 1024, 128, 16)
 
             self.d5 = Block(512, 128, sample='up')
-            self.a5 = Attention_block(128, 128, 64)
+            self.a5 = Attention_block(128, 512, 64, 32)
 
             self.d6 = Block(256, 64, sample='up')
-            self.a6 = Attention_block(64, 64, 32)
+            self.a6 = Attention_block(64, 256, 32, 64)
 
             self.d7 = L.Convolution2D(128, out_ch, 3, 1, 1, initialW=w)
 
@@ -81,36 +81,35 @@ class Generator(chainer.Chain):
         h7 = self.e6(h6)
         h8 = self.e7(h7)
 
-        h9 = self.d0(h8)
+        h = self.d0(h8)
+        attn0 = self.a0(x=h7, g=h8)
+        h9 = F.concat([h, attn0], axis=1)
 
-        attn0 = self.a0(x=h7, g=h9)
-        con = F.concat([h9, attn0], axis=1)
-        h10 = self.d1(con)
+        h = self.d1(h9)
+        attn1 = self.a1(x=h6, g=h9)
+        h10 = F.concat([h, attn1], axis=1)
 
-        attn1 = self.a1(x=h6, g=h10)
-        con = F.concat([h10, attn1], axis=1)
-        h11 = self.d2(con)
+        h = self.d2(h10)
+        attn2 = self.a2(x=h5, g=h10)
+        h11 = F.concat([h, attn2], axis=1)
 
-        attn2 = self.a2(x=h5, g=h11)
-        con = F.concat([h11, attn2], axis=1)
-        h12 = self.d3(con)
+        h = self.d3(h11)
+        attn3 = self.a3(x=h4, g=h11)
+        h12 = F.concat([h, attn3], axis=1)
 
-        attn3 = self.a3(x=h4, g=h12)
-        con = F.concat([h12, attn3], axis=1)
-        h13 = self.d4(con)
+        h = self.d4(h12)
+        attn4 = self.a4(x=h3, g=h12)
+        h13 = F.concat([h, attn4], axis=1)
 
-        attn4 = self.a4(x=h3, g=h13)
-        con = F.concat([h13, attn4], axis=1)
-        h14 = self.d5(con)
+        h = self.d5(h13)
+        attn5 = self.a5(x=h2, g=h13)
+        h14 = F.concat([h, attn5], axis=1)
 
-        attn5 = self.a5(x=h2, g=h14)
-        con = F.concat([h14, attn5], axis=1)
-        h15 = self.d6(con)
+        h = self.d6(h14)
+        attn6 = self.a6(x=h1, g=h14)
+        h15 = F.concat([h, attn6], axis=1)
 
-        attn6 = self.a6(x=h1, g=h15)
-        con = F.concat([h15, attn6], axis=1)
-        out = self.d7(con)
-
+        out = self.d7(h15)
         out = F.tanh(out)
 
         return out

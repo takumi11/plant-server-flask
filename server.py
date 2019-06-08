@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from datetime import datetime
 import os
-from model import unet, classifier
+from model import re_attention_unet, classifier
 import tool
 import chainer
 import chainer.links as L
@@ -26,10 +26,10 @@ if not os.path.isdir(ORG_DIR):
     os.mkdir(ORG_DIR)
 
 print("load model")
-gen = unet.Generator(in_ch=3, out_ch=3, upsample='conv')
-chainer.serializers.load_npz('./model/unet.npz', gen)
+gen = re_attention_unet.Generator(in_ch=3, out_ch=3, upsample='conv')
+chainer.serializers.load_npz('./model/re_attention_unet.npz', gen)
 classify = L.Classifier(classifier.ResNet50_Fine(output=8))
-chainer.serializers.load_npz('./model/snap_model.npz', classify)
+chainer.serializers.load_npz('./model/snap_model_big.npz', classify)
 print("finish")
 
 app = Flask(__name__, static_url_path="")
