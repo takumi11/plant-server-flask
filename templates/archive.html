@@ -1,25 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-<h3 style="text-align:center;margin:10px;"> アーカイブ </h3>
-<table class="table table-striped table-hover width="80%"">
-    <tr>
-        <th>id</th>
-        <th>image</th>
+<h3 style="text-align:center;margin:10px;"><strong> アーカイブ </strong></h3>
+<div style="margin: 20px 50px 20px 50px;">
+    <table class="table-tag table-striped table-hover" width="100%">
+    <tr height="50" bgcolor="#C0C0C0">
+        <th width="50">id</th>
+        <th width="100">image</th>
         <th>inputname</th>
-        <th>disease</th>
-        <th>savename</th>
-        <th>created</th>
-        <th>操作</th>
+        <th width="200">disease</th>
+        <th width="200">savename</th>
+        <th width="200">created</th>
+        <th width="200">操作</th>
     </tr>
+    </table>
+
+    <table class="table-content table-striped table-hover" width="100%">
     {% for result in results %}
-    <tr>
-        <td>{{ result.id }}</td>
-        <td><img src="/images/origin/{{ result.savename }}" width="30" height="30"></td>
+    <tr height="50">
+        <td width="50">{{ result.id }}</td>
+        <td width="100"><img src="/images/origin/{{ result.savename }}" width="40" height="40"></td>
         <td>{{ result.inputname}}</td>
-        <td>{{ result.disease}}</td>
-        <td>{{ result.savename}}</td>
-        <td>{{ result.created }}</td>
-        <td>
+        <td width="200">{{ result.disease}}</td>
+        <td width="200">{{ result.savename}}</td>
+        <td width="200">{{ result.created }}</td>
+        <td width="200">
             <a href="/view/{{ result.id }}">
                 <button class="btn btn-primary">参照</button>
             </a>
@@ -30,7 +34,17 @@
         </td>
     </tr>
     {% endfor %}
-</table>
+    </div>
+    </table>
+
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/PaginateMyTable.css') }}">
+    <script type=text/javascript src="{{ url_for('static', filename='js/PaginateMyTable.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $(".table-content").paginate();
+        });
+    </script>
+</div>
 
 <div>
     <a href="/classification">
