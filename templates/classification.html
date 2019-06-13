@@ -1,32 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
      <center>
-      <div class="card" style="width: 100rem;margin:10px;">
-          <center>
-          <h4>ファイルを選択して送信してください</h4>
-              <form action = "/classification" method = "POST" enctype = "multipart/form-data">
-                  <input type="file" name="file" id="elmFile" onchange="selectFile()">
-                  <input type="submit" class="btn btn-danger" id="btnUpload" value="送信する" style="margin:10px;">
-                  <script type="text/javascript">
-                        window.onload = function() {
-                            document.getElementById("btnUpload").disabled = true;
-                        }
-                        function selectFile() {
-                            if (document.getElementById("elmFile").value === "") {
+        <p> ファイルをアップロードしてください </p>
+        <form action = "/classification" method = "POST" enctype = "multipart/form-data">
+            <div id="drag-drop-area">
+                <div class="drag-drop-inside">
+                    <input type="file" name="file" id="elmFile" onchange="selectFile()">
+                    <input type="submit" class="btn btn-danger" id="btnUpload" value="アップロード" style="margin:10px;">
+                    <script type="text/javascript">
+                            window.onload = function() {
                                 document.getElementById("btnUpload").disabled = true;
                             }
-                            else {
-                            document.getElementById("btnUpload").disabled = false;
-                            }
-                        }
-                </script>
-              </form>
-          </center>
-      </div>
+                            function selectFile() {
+                                if (document.getElementById("elmFile").value === "") {
+                                    document.getElementById("btnUpload").disabled = true;
+                                }
+                                else {
+                                    document.getElementById("btnUpload").disabled = false;
+                                }
+                            }   
+                    </script>
+                </div>
+            </div>             
+        </form>
       <a href="/archive">
           <button class="btn btn-primary"> アーカイブ </button>
       </a>
-  </center>
+     </center>
 
       {% if name_path %}
       <center>
@@ -35,7 +35,13 @@
                   <img src="/images/origin/{{ name_path }}" width="300" height="300">
                   <img src="/images/masked/{{ name_path }}" width="300" height="300">
                   <img src="/images/gradcam/{{ name_path }}" width="300" height="300">
-                  <h3 style="text-align:center;">[{{ pk }}] State : {{ top1 }}    [{{ result }} %] </h3>
+                  <h3 style="text-align:center;">[{{ pk }}] Probs : {{ prob }}</h3>
+                  <div style="padding: 10px; background: #fff; border: 2px solid #006;
+                              border-radius: 10px; font-size: 16px; color: #000;">
+                    {% for label, result in output %}
+                        <h3>{{ label }}    [{{ result }} %] </h3>
+                    {% endfor %}
+                  </div>
               </p>
           </div>
       </center>

@@ -4,8 +4,9 @@ import chainer
 import chainer.functions as F
 from chainer import Variable
 
-labels = ['MYSV', 'ZYMV', 'CCYV', 'CMV', 'PRSV', 'WMV', 'KGMMV', 'HEALTHY']
-label_dic = {i: a for i, a in enumerate(labels)}
+labels_12 = ['MYSV', 'ZYMV', 'CCYV', 'CMV', 'PRSV', 'WMV', 'KGMMV',
+             'HEALTHY', 'BrownSpot', 'DownyMildew', 'GrayMold', 'PowderyMildew']
+label_dic_12 = {i: a for i, a in enumerate(labels_12)}
 
 
 def generate(input_image, gen):
@@ -37,12 +38,21 @@ def classifier(input_image, classify):
         with chainer.using_config('train', False):
             x_in = Variable(x_in)
             x_out = classify.predictor(x_in)
-            out = F.softmax(x_out)
-    out = out.array
-    top1 = np.argmax(out)
-    top1_label = label_dic[top1]
-    result = out[0][top1]
-    return top1_label, round(result*100, 3)
+            probs = F.softmax(x_out).array
+    # top1 = np.argmax(probs)
+    # top1_label = label_dic_12[top1]
+    # result = probs[0][top1]
+
+    top = np.argsort(probs)
+    top = top.tolist()[0]
+    print(top)
+    labels = [label_dic_12[i] for i in top]
+    results = [round(probs[0][i]*100, 3) for i in top]
+    print(labels[::-1])
+    print(results[::-1])
+
+    # return top1_label, round(result*100, 3)
+    return labels[::-1], results[::-1]
 
 
 def grad_cam(input_image, classify):
@@ -57,7 +67,7 @@ def grad_cam(input_image, classify):
     top = np.argsort(probs)[::-1][0]
 
     pred.zerograd()
-    pred.grad = np.zeros([1, 8], dtype=np.float32)
+    pred.grad = np.zeros([1, 12], dtype=np.float32)
     pred.grad[0, top] = 1
     pred.backward(True)
 

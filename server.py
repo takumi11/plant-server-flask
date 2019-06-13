@@ -27,9 +27,9 @@ if not os.path.isdir(ORG_DIR):
 
 print("load model")
 gen = re_attention_unet.Generator(in_ch=3, out_ch=3, upsample='conv')
-chainer.serializers.load_npz('./model/re_attention_unet.npz', gen)
-classify = L.Classifier(classifier.ResNet50_Fine(output=8))
-chainer.serializers.load_npz('./model/snap_model_big.npz', classify)
+chainer.serializers.load_npz('./model/weight/re_attention_unet.npz', gen)
+classify = L.Classifier(classifier.ResNet50_Fine(output=12))
+chainer.serializers.load_npz('./model/weight/snap_model_12.npz', classify)
 print("finish")
 
 app = Flask(__name__, static_url_path="")
@@ -114,21 +114,26 @@ def upload():
 
             # background remove and save image
             out = tool.generate(org, gen)
+            print('clear background remove')
             cv2.imwrite(masked_path, cv2.cvtColor(out, cv2.COLOR_RGB2BGR))
             # classification
-            top1_label, result = tool.classifier(out, classify)
+            labels, results = tool.classifier(out, classify)
+            print('clear classificatin')
             # grad cam and save image
             gradcam = tool.grad_cam(out, classify)
+            print('clear gradcam')
             cv2.imwrite(gradcam_path, gradcam)
 
             con = get_db()
-            pk = tool.insert(con, file_name, top1_label, now+".jpg")
+            pk = tool.insert(con, file_name, labels[0], now+".jpg")
 
             return render_template('classification.html',
                                    name_path=now + ".jpg",
-                                   pk=pk, top1=top1_label, result=result)
+                                   pk=pk, prob=labels[0],
+                                   output=zip(labels, results))
 
         except Exception as e:
+            print(e)
             return render_template('bad_request.html')
 
 
