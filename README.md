@@ -1,4 +1,4 @@
 # plant-server
 
 ## Demo
-![demo](forREADME/image.png)
+![demo](for_README/image.png)
