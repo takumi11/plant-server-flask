@@ -106,22 +106,15 @@ def upload():
         try:
             org = cv2.imdecode(img_array, 1)
 
-            # centercrop & resize
             org = tool.center_crop(org)
             org = cv2.resize(org, (256, 256))
             cv2.imwrite(origin_path, org)
             org = cv2.cvtColor(org, cv2.COLOR_BGR2RGB)
 
-            # background remove and save image
             out = tool.generate(org, gen)
-            print('clear background remove')
             cv2.imwrite(masked_path, cv2.cvtColor(out, cv2.COLOR_RGB2BGR))
-            # classification
             labels, results = tool.classifier(out, classify)
-            print('clear classificatin')
-            # grad cam and save image
             gradcam = tool.grad_cam(out, classify)
-            print('clear gradcam')
             cv2.imwrite(gradcam_path, gradcam)
 
             con = get_db()

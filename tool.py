@@ -41,11 +41,8 @@ def classifier(input_image, classify):
 
     top = np.argsort(probs)
     top = top.tolist()[0]
-    print(top)
     labels = [label_dic_12[i] for i in top]
     results = [round(probs[0][i]*100, 3) for i in top]
-    print(labels[::-1])
-    print(results[::-1])
 
     return labels[::-1], results[::-1]
 
