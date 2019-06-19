@@ -15,7 +15,6 @@ def generate(input_image, gen):
         "f").transpose(2, 0, 1) / 128.0 - 1.0
     x_in = x_in.reshape(1, 3, 256, 256)
 
-    # print('input generater')
     with chainer.no_backprop_mode():
         with chainer.using_config('train', False):
             x_in = Variable(x_in)
@@ -39,9 +38,6 @@ def classifier(input_image, classify):
             x_in = Variable(x_in)
             x_out = classify.predictor(x_in)
             probs = F.softmax(x_out).array
-    # top1 = np.argmax(probs)
-    # top1_label = label_dic_12[top1]
-    # result = probs[0][top1]
 
     top = np.argsort(probs)
     top = top.tolist()[0]
@@ -51,7 +47,6 @@ def classifier(input_image, classify):
     print(labels[::-1])
     print(results[::-1])
 
-    # return top1_label, round(result*100, 3)
     return labels[::-1], results[::-1]
 
 
@@ -108,7 +103,6 @@ def center_crop(img):
 
 
 def insert(con, inputname, disease, savename):
-    """ INSERT処理 """
     cur = con.cursor()
     cur.execute('insert into results (inputname, disease, savename) values (?, ?, ?)', [
                 inputname, disease, savename])
@@ -118,21 +112,18 @@ def insert(con, inputname, disease, savename):
 
 
 def select(con, pk):
-    """ 指定したキーのデータをSELECTする """
     cur = con.execute(
         'select id, inputname, disease, savename, created from results where id=?', (pk,))
     return cur.fetchone()
 
 
 def select_all(con):
-    """ SELECTする """
     cur = con.execute(
         'select id, inputname, disease, savename, created from results order by id desc')
     return cur.fetchall()
 
 
 def delete(con, pk):
-    """ 指定したキーのデータをDELETEする """
     cur = con.cursor()
     cur.execute('delete from results where id=?', (pk,))
     con.commit()
