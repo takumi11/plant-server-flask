@@ -32,19 +32,82 @@
       <center>
           <div class="result" style="margin:10px;">
               <p style="text-align:center;">
-                  <img src="/images/origin/{{ name_path }}" width="300" height="300">
-                  <img src="/images/masked/{{ name_path }}" width="300" height="300">
-                  <img src="/images/gradcam/{{ name_path }}" width="300" height="300">
-                  <div style="padding: 8px 19px; margin: 2em 0; color: #2c2c2f;
+                  <img src="/images/origin/{{ name_path }}" width="200" height="200">
+                  <img src="/images/masked/{{ name_path }}" width="200" height="200">
+                  <img src="/images/gradcam/{{ name_path }}" width="200" height="200">
+
+                  <div style="padding: 4px 8px; margin: 2em; color: #2c2c2f;
                               background: #cde4ff; border-top: solid 5px #5989cf;
-                              border-bottom: solid 5px #5989cf; width: 500px">
+                              border-bottom: solid 5px #5989cf; width: 400px">
                     <h3 style="text-align:center;">[{{ pk }}] Probs : {{ prob }}</h3>
                   </div>
+
                   <div style="padding: 10px; background: #fff; border: 2px solid #006;
                               border-radius: 10px; font-size: 16px; color: #000;">
-                    {% for label, result in output %}
-                        <h3>{{ label }}    [{{ result }} %] </h3>
-                    {% endfor %}
+
+                    <div style="display: flex;
+                                justify-content: center;">
+
+                        <div class="probbility">
+                        <h2 class="text-dark" style="text-align:center;">table</h2>
+                        <table class="table-content table-striped table-hover">
+                            <tr height="50" bgcolor="#C0C0C0">
+                                <th width="300" align="center">status</th>
+                                <th width="300" align="center">probability</th>
+                            </tr>
+                        </table>
+                        <table class="table-content table-striped table-hover">
+                            {% for label in labels %}{% set label_loop = loop %}
+                            {% for result in results %}{% if loop.index==label_loop.index %}
+                            <tr height="50">
+                                <td width="300" align="center">{{ label }}</td>
+                                <td width="300" align="center">{{ result }}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        </table>
+                        </div>
+
+                        <div style="width: 50%">
+                            <h2 class="text-dark" style="text-align:center;">chart</h2>
+                            <canvas id="pie-chart" height="300" width="300"></canvas>
+                        </div>
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+                        <script>
+                            var Data = {
+                                labels : [{% for label in labels %}
+                                    "{{label}}",
+                                    {% endfor %}],
+                                datasets : [
+                                    {
+                                        data : [{% for result in results %}
+                                            {{result}},
+                                            {% endfor %}],
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 1)',
+                                            'rgba(54, 162, 235, 1)',
+                                            'rgba(255, 206, 86, 1)',
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(153, 102, 255, 1)',
+                                            'rgba(255, 159, 64, 1)',
+                                            'rgba(255, 0, 0, 1)',
+                                            'rgba(0, 0, 255, 1)',
+                                            'rgba(0, 255, 0, 1)',
+                                            'rgba(75, 255, 255, 1)',
+                                            'rgba(153, 102, 0, 1)',
+                                            'rgba(100, 159, 64, 1)'
+                                        ]
+                                    }
+                                ]
+                            };
+                            
+                            var ctx = document.getElementById("pie-chart").getContext("2d");
+                            new Chart(ctx, {type:'doughnut', data:Data});
+
+                        </script>
+                    </div>
+
                   </div>
               </p>
           </div>

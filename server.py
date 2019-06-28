@@ -123,7 +123,7 @@ def upload():
             return render_template('classification.html',
                                    name_path=now + ".jpg",
                                    pk=pk, prob=labels[0],
-                                   output=zip(labels, results))
+                                   labels=labels, results=results)
 
         except Exception as e:
             print(e)
