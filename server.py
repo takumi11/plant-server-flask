@@ -1,18 +1,14 @@
-import numpy as np
-import cv2
-from datetime import datetime
 import os
-from model import re_attention_unet, classifier
-import tool
+import sqlite3
+from datetime import datetime
+
 import chainer
 import chainer.links as L
-import sqlite3
-from flask import (
-    Flask,
-    render_template,
-    request,
-    send_from_directory,
-    g,)
+import cv2
+import numpy as np
+import tool
+from flask import Flask, g, render_template, request, send_from_directory
+from model import classifier, re_attention_unet
 
 ORG_DIR = "./images/origin"
 MASKES_DIR = "./images/masked"
@@ -114,7 +110,7 @@ def upload():
             out = tool.generate(org, gen)
             cv2.imwrite(masked_path, cv2.cvtColor(out, cv2.COLOR_RGB2BGR))
             labels, results = tool.classifier(out, classify)
-            gradcam = tool.grad_cam(out, classify)
+            gradcam = tool.grad_cam(out, classify, logger=app.logger)
             cv2.imwrite(gradcam_path, gradcam)
 
             con = get_db()
@@ -126,7 +122,7 @@ def upload():
                                    labels=labels, results=results)
 
         except Exception as e:
-            print(e)
+            app.logger.exception(e)
             return render_template('bad_request.html')
 
 

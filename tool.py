@@ -1,7 +1,7 @@
-import numpy as np
-import cv2
 import chainer
 import chainer.functions as F
+import cv2
+import numpy as np
 from chainer import Variable
 
 labels_12 = ['MYSV', 'ZYMV', 'CCYV', 'CMV', 'PRSV', 'WMV', 'KGMMV',
@@ -47,7 +47,7 @@ def classifier(input_image, classify):
     return labels[::-1], results[::-1]
 
 
-def grad_cam(input_image, classify):
+def grad_cam(input_image, classify, logger=None):
     img = cv2.resize(input_image, (224, 224)).astype(
         "f").transpose(2, 0, 1) / 255.0
     img = img.reshape(1, 3, 224, 224)
@@ -68,6 +68,9 @@ def grad_cam(input_image, classify):
 
     cam = np.ones(feature.shape[1:], dtype=np.float32)
     weights = grad.mean((1, 2))*5000
+    if logger:
+        logger.info(f'Gradients: {weights}')
+
     for i, w in enumerate(weights):
         cam += feature[i] * w
 
